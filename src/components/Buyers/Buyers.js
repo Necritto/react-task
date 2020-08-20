@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import classes from "./Buyers.module.scss";
 
-import orderBy from "lodash/orderBy";
+import { orderBy, chunk } from "lodash";
 import { Link } from "react-router-dom";
+import ReactPaginate from "react-paginate";
 
 export const Buyers = () => {
   const buyers = [
@@ -26,9 +27,16 @@ export const Buyers = () => {
   const [data, setData] = useState(buyers);
   const [sort, setSort] = useState("asc");
   const [sortField, setSortField] = useState("");
+  const [countBuyers, setCountBuyers] = useState(5);
+  const [currentPage, setCurrentPage] = useState(0);
+  const maxBuyersOnPage = 15;
+  let pageSize = Math.ceil(maxBuyersOnPage / countBuyers);
+
+  const displayedData =
+    countBuyers !== maxBuyersOnPage ? chunk(data, countBuyers)[currentPage] : data;
 
   const onSort = (sortField) => {
-    const cloneBuyers = buyers.concat();
+    const cloneBuyers = data.concat();
     const sortType = sort === "asc" ? "desc" : "asc";
 
     const orderedData = orderBy(cloneBuyers, sortField, sortType);
@@ -38,8 +46,22 @@ export const Buyers = () => {
     setSortField(sortField);
   };
 
+  const handlePageClick = ({ selected }) => {
+    setCurrentPage(selected);
+  };
+
+  const onBuyersCount = (count) => {
+    setCountBuyers(count);
+  };
+
   return (
     <div className={classes.table_wrap}>
+      <div className={classes.paginationBtn}>
+        <span>Число покупателей: </span>
+        <button onClick={() => onBuyersCount(5)}>5</button>
+        <button onClick={() => onBuyersCount(10)}>10</button>
+        <button onClick={() => onBuyersCount(15)}>15</button>
+      </div>
       <table className={classes.buyers}>
         <thead>
           <tr>
@@ -82,7 +104,7 @@ export const Buyers = () => {
               )}
             </th>
           </tr>
-          {data.map((buyer) => (
+          {displayedData.map((buyer) => (
             <tr key={buyer.id}>
               <td>
                 <Link to={`/buyers/${buyer.id}`}>{buyer.id}</Link>
@@ -95,7 +117,29 @@ export const Buyers = () => {
           ))}
         </tbody>
       </table>
-      <div className={classes.pagination}></div>
+      <div className={classes.pagination}>
+        {countBuyers !== maxBuyersOnPage && (
+          <ReactPaginate
+            previousLabel={"<"}
+            nextLabel={">"}
+            breakLabel={"..."}
+            breakClassName={"break-me"}
+            pageCount={pageSize}
+            marginPagesDisplayed={2}
+            pageRangeDisplayed={5}
+            forcePage={currentPage}
+            onPageChange={handlePageClick}
+            containerClassName={classes.pagination}
+            activeClassName={classes.active}
+            pageClassName={classes.page_item}
+            pageLinkClassName={classes.page_link}
+            previousClassName={classes.page_item}
+            nextClassName={classes.page_item}
+            previousLinkClassName={classes.page_link}
+            nextLinkClassName={classes.page_link}
+          />
+        )}
+      </div>
     </div>
   );
 };

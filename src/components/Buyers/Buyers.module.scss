@@ -1,0 +1,118 @@
+.table_wrap {
+  overflow-x: auto;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.buyers {
+  color: #ffffff;
+  border-collapse: collapse;
+  border-spacing: 0;
+  width: 100%;
+
+  thead {
+    th {
+      padding: 10px;
+      font-size: 26px;
+      margin: 0;
+    }
+  }
+
+  td,
+  th {
+    padding: 10px;
+  }
+
+  th {
+    text-align: left;
+    font-size: 18px;
+    cursor: pointer;
+    user-select: none;
+
+    &:first-of-type {
+      cursor: text;
+    }
+
+    small {
+      margin-left: 5px;
+      font-size: 20px;
+    }
+  }
+
+  tbody {
+    tr {
+      border-bottom: 1px solid #ffffff;
+
+      &:first-of-type,
+      &:last-of-type {
+        border-bottom: none;
+      }
+
+      &:first-of-type {
+        background: transparent;
+      }
+
+      background: rgba(0, 0, 0, 0.3);
+
+      td {
+        &:last-of-type {
+          text-align: center;
+        }
+
+        &::first-letter {
+          text-transform: uppercase;
+        }
+
+        a {
+          color: #ffffff;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 580px) {
+  .table_wrap {
+    max-width: 300px;
+  }
+  .buyers {
+    thead {
+      th {
+        font-size: 20px;
+        text-indent: 19%;
+        transform: translateX(50%);
+      }
+    }
+    tr {
+      th:first-child {
+        display: block;
+        width: 150px;
+      }
+      td:first-child {
+        display: block;
+        width: 150px;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+      }
+    }
+  }
+}
+
+@media (max-width: 440px) {
+  .table_wrap {
+    max-width: 250px;
+  }
+  .buyers {
+    transform: scale(0.8);
+    tr {
+      font-size: 14px;
+    }
+  }
+}
+
+@media (max-width: 400px) {
+  .buyers {
+    transform: scale(0.75);
+  }
+}

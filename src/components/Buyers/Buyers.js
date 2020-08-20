@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import classes from "./Buyers.module.scss";
 
+import orderBy from "lodash/orderBy";
 import { Link } from "react-router-dom";
 
 export const Buyers = () => {
@@ -22,6 +23,21 @@ export const Buyers = () => {
     { id: 14, name: "Алексей", check: 1000, amount: 9, proceeds: 236734 },
   ];
 
+  const [data, setData] = useState(buyers);
+  const [sort, setSort] = useState("asc");
+  const [sortField, setSortField] = useState("");
+
+  const onSort = (sortField) => {
+    const cloneBuyers = buyers.concat();
+    const sortType = sort === "asc" ? "desc" : "asc";
+
+    const orderedData = orderBy(cloneBuyers, sortField, sortType);
+
+    setData(orderedData);
+    setSort(sortType);
+    setSortField(sortField);
+  };
+
   return (
     <div className={classes.table_wrap}>
       <table className={classes.buyers}>
@@ -33,12 +49,40 @@ export const Buyers = () => {
         <tbody>
           <tr>
             <th>ID покупателя</th>
-            <th>Имя покупателя</th>
-            <th>Средний чек</th>
-            <th>Количество покупок</th>
-            <th>Общая выручка</th>
+            <th onClick={onSort.bind(null, "name")}>
+              Имя покупателя
+              {sortField === "name" && sort === "asc" ? (
+                <small>&darr;</small>
+              ) : (
+                <small>&uarr;</small>
+              )}
+            </th>
+            <th onClick={onSort.bind(null, "check")}>
+              Средний чек
+              {sortField === "check" && sort === "asc" ? (
+                <small>&darr;</small>
+              ) : (
+                <small>&uarr;</small>
+              )}
+            </th>
+            <th onClick={onSort.bind(null, "amount")}>
+              Количество покупок
+              {sortField === "amount" && sort === "asc" ? (
+                <small>&darr;</small>
+              ) : (
+                <small>&uarr;</small>
+              )}
+            </th>
+            <th onClick={onSort.bind(null, "proceeds")}>
+              Общая выручка
+              {sortField === "proceeds" && sort === "asc" ? (
+                <small>&darr;</small>
+              ) : (
+                <small>&uarr;</small>
+              )}
+            </th>
           </tr>
-          {buyers.map((buyer) => (
+          {data.map((buyer) => (
             <tr key={buyer.id}>
               <td>
                 <Link to={`/buyers/${buyer.id}`}>{buyer.id}</Link>

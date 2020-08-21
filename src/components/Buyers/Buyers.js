@@ -29,11 +29,48 @@ export const Buyers = () => {
   const [sortField, setSortField] = useState("");
   const [countBuyers, setCountBuyers] = useState(5);
   const [currentPage, setCurrentPage] = useState(0);
+  const [searchValue, setSearchValue] = useState("");
+  const [search, setSearch] = useState("");
+
   const maxBuyersOnPage = 15;
-  let pageSize = Math.ceil(maxBuyersOnPage / countBuyers);
+
+  let filtredData = getFiltredData();
+
+  if (filtredData.length === 0) filtredData = data;
+
+  const onBuyersCount = (count) => {
+    setCountBuyers(count);
+    setCurrentPage(0);
+    setSearch("");
+  };
+
+  const getPageSize = () => {
+    switch (countBuyers) {
+      case 5: {
+        return Math.ceil(filtredData.length / 5);
+      }
+      case 10: {
+        return Math.ceil(filtredData.length / 10);
+      }
+      case 15: {
+        return Math.ceil(filtredData.length / 15);
+      }
+      default: {
+        return 5;
+      }
+    }
+  };
+
+  const onSearch = (searchValue) => {
+    setSearch(searchValue);
+    setCurrentPage(0);
+    setSearchValue("");
+  };
+
+  const pageSize = getPageSize();
 
   const displayedData =
-    countBuyers !== maxBuyersOnPage ? chunk(data, countBuyers)[currentPage] : data;
+    countBuyers !== maxBuyersOnPage ? chunk(filtredData, countBuyers)[currentPage] : data;
 
   const onSort = (sortField) => {
     const cloneBuyers = data.concat();
@@ -50,17 +87,40 @@ export const Buyers = () => {
     setCurrentPage(selected);
   };
 
-  const onBuyersCount = (count) => {
-    setCountBuyers(count);
+  const onSearchChange = (e) => {
+    setSearchValue(e.target.value);
   };
+
+  function getFiltredData() {
+    if (!search) {
+      return data;
+    }
+
+    return data.filter((item) => {
+      return item["name"].toLowerCase().includes(search.toLowerCase());
+    });
+  }
 
   return (
     <div className={classes.table_wrap}>
-      <div className={classes.paginationBtn}>
-        <span>Число покупателей: </span>
-        <button onClick={() => onBuyersCount(5)}>5</button>
-        <button onClick={() => onBuyersCount(10)}>10</button>
-        <button onClick={() => onBuyersCount(15)}>15</button>
+      <div className={classes.controls}>
+        <div className={classes.paginationBtn}>
+          <span>Число покупателей: </span>
+          <button onClick={() => onBuyersCount(5)}>5</button>
+          <button onClick={() => onBuyersCount(10)}>10</button>
+          <button onClick={() => onBuyersCount(15)}>15</button>
+        </div>
+        <div className={classes.table_search}>
+          <div className={classes.table_search__brn}>
+            <button onClick={() => onSearch(searchValue)}>Search</button>
+          </div>
+          <input
+            type="text"
+            placeholder="Введите имя"
+            value={searchValue}
+            onChange={onSearchChange}
+          />
+        </div>
       </div>
       <table className={classes.buyers}>
         <thead>

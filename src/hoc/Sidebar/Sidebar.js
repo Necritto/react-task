@@ -1,23 +1,18 @@
 import React from "react";
 import classes from "./Sidebar.module.scss";
 
-import { NavLink } from "react-router-dom";
+import { NavLink, withRouter } from "react-router-dom";
+import { connect } from "react-redux";
+import { authLogout } from "../../store/authAction";
 
-export const Sidebar = ({ children }) => {
-  const imgSrc = sessionStorage.getItem("avatar_url");
-
-  const logoutHendler = () => {
-    sessionStorage.clear();
-    window.location.reload(true);
-  };
-
+const Sidebar = (props) => {
   return (
     <div className={classes.container}>
       <div className={classes.sidebar}>
         <aside className={classes.aside}>
           <div className={classes.aside__wrap}>
             <div className={classes.aside__image}>
-              <img src={imgSrc} alt="src" />
+              <img src={props.userAvatar} alt="src" />
             </div>
             <nav className={classes.aside__nav}>
               <ul>
@@ -42,13 +37,27 @@ export const Sidebar = ({ children }) => {
               </ul>
             </nav>
             <div className={classes.aside__footer}>
-              <button onClick={logoutHendler}>Выйти</button>
+              <button onClick={props.authLogout}>Выйти</button>
               <span>Copyright &copy; 2020</span>
             </div>
           </div>
         </aside>
-        <>{children}</>
+        <>{props.children}</>
       </div>
     </div>
   );
 };
+
+function mapStateToProps(state) {
+  return {
+    userAvatar: state.userAvatar,
+  };
+}
+
+function mapDispatchToProps(dispatch) {
+  return {
+    authLogout: () => dispatch(authLogout()),
+  };
+}
+
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Sidebar));

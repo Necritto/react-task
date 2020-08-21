@@ -2,8 +2,10 @@ import React, { useState } from "react";
 import classes from "./Auth.module.scss";
 
 import Axios from "axios";
+import { connect } from "react-redux";
+import { getAvatar, authSuccess } from "../../store/authAction";
 
-export const Auth = () => {
+const Auth = (props) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
@@ -21,7 +23,7 @@ export const Auth = () => {
 
   const onSubmitHandler = async (e) => {
     e.preventDefault();
-    (await formValidation()) && window.location.reload(true);
+    await formValidation();
   };
 
   const formValidation = async () => {
@@ -56,8 +58,7 @@ export const Auth = () => {
         );
         if (resp.status === 200) {
           isUsernameValid = true;
-          const avatar = resp.data.avatar_url;
-          sessionStorage.setItem("avatar_url", avatar);
+          props.getAvatar(resp.data.avatar_url);
         } else {
           isUsernameValid = false;
         }
@@ -67,9 +68,11 @@ export const Auth = () => {
       }
     }
 
-    if (isPasswordValid && isUsernameValid) isValid = true;
+    if (isPasswordValid && isUsernameValid) {
+      isValid = true;
+      props.authSuccess();
+    }
 
-    sessionStorage.setItem("isValid", isValid);
     return isValid;
   };
 
@@ -106,3 +109,12 @@ export const Auth = () => {
     </form>
   );
 };
+
+function mapDispatchToProps(dispatch) {
+  return {
+    getAvatar: (avatar_url) => dispatch(getAvatar(avatar_url)),
+    authSuccess: () => dispatch(authSuccess()),
+  };
+}
+
+export default connect(null, mapDispatchToProps)(Auth);

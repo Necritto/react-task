@@ -4,11 +4,11 @@
 
 .sidebar {
   display: flex;
-  justify-content: space-between;
 
   .aside {
     flex-basis: 12%;
     height: 100vh;
+    position: relative;
 
     .aside__wrap {
       height: 100%;
@@ -46,15 +46,32 @@
     .aside__footer {
       color: #ffffff;
       text-align: center;
+
+      button {
+        position: absolute;
+        bottom: 15%;
+        left: 50%;
+        transform: translateX(-50%);
+        color: #ffffff;
+        font-weight: bold;
+        text-transform: uppercase;
+        border: none;
+        border-radius: 50%;
+        background: #0fc3f5;
+        transition: background 0.3s;
+        cursor: pointer;
+        width: 50px;
+        height: 50px;
+
+        &:hover {
+          background: #4442db;
+        }
+      }
     }
 
     .active_link {
       text-shadow: 1px 1px 2px #4442db;
     }
-  }
-
-  main {
-    flex-basis: 88%;
   }
 }
 

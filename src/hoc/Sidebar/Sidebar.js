@@ -4,13 +4,20 @@ import classes from "./Sidebar.module.scss";
 import { NavLink } from "react-router-dom";
 
 export const Sidebar = ({ children }) => {
+  const imgSrc = sessionStorage.getItem("avatar_url");
+
+  const logoutHendler = () => {
+    sessionStorage.clear();
+    window.location.reload(true);
+  };
+
   return (
     <div className={classes.container}>
       <div className={classes.sidebar}>
         <aside className={classes.aside}>
           <div className={classes.aside__wrap}>
             <div className={classes.aside__image}>
-              <img src="https://source.unsplash.com/100x100/?nature,water" alt="src" />
+              <img src={imgSrc} alt="src" />
             </div>
             <nav className={classes.aside__nav}>
               <ul>
@@ -35,11 +42,12 @@ export const Sidebar = ({ children }) => {
               </ul>
             </nav>
             <div className={classes.aside__footer}>
+              <button onClick={logoutHendler}>Выйти</button>
               <span>Copyright &copy; 2020</span>
             </div>
           </div>
         </aside>
-        <main>{children}</main>
+        <>{children}</>
       </div>
     </div>
   );

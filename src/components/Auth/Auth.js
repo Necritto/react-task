@@ -7,8 +7,8 @@ export const Auth = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
-  const [usernameErr, setUsernameErr] = useState({});
-  const [passwordErr, setPasswordErr] = useState({});
+  const [usernameErr, setUsernameErr] = useState("");
+  const [passwordErr, setPasswordErr] = useState("");
 
   const CLIENT_ID = process.env.REACT_APP_CLIENT_ID;
   const CLIENT_SECRET = process.env.REACT_APP_CLIENT_SECRET;
@@ -21,29 +21,32 @@ export const Auth = () => {
 
   const onSubmitHandler = async (e) => {
     e.preventDefault();
-    await formValidation();
+    (await formValidation()) && window.location.reload(true);
   };
 
   const formValidation = async () => {
-    const usernameErr = {};
-    const passwordErr = {};
-    let isValid = true;
+    let isPasswordValid = false;
+    let isUsernameValid = false;
+    let isValid = false;
+
+    setPasswordErr("");
+    setUsernameErr("");
 
     const regExp = /^.(?=.*[a-zA-Z])(?=.*\d).*$/;
 
     if (!regExp.test(password)) {
-      passwordErr.err = "Пароль должен содержать большую и маленькую буквы и цифры";
-      isValid = false;
-    }
-
-    if (password.length < 8) {
-      passwordErr.err = "Пароль должен быть не менее 8 символов";
-      isValid = false;
+      setPasswordErr("Пароль должен содержать большую и маленькую буквы и цифры");
+      isPasswordValid = false;
+    } else if (password.length < 8) {
+      setPasswordErr("Пароль должен быть не менее 8 символов");
+      isPasswordValid = false;
+    } else {
+      isPasswordValid = true;
     }
 
     if (!username) {
-      isValid = false;
-      usernameErr.err = "Пользователь не существует";
+      isUsernameValid = false;
+      setUsernameErr("Пользователь не существует");
     }
 
     if (username) {
@@ -51,16 +54,22 @@ export const Auth = () => {
         const resp = await Axios.get(
           `https://api.github.com/users/${username}?client_id=${CLIENT_ID}&client_secret=${CLIENT_SECRET}`
         );
-        resp.status === 200 ? (isValid = true) : (isValid = false);
+        if (resp.status === 200) {
+          isUsernameValid = true;
+          const avatar = resp.data.avatar_url;
+          sessionStorage.setItem("avatar_url", avatar);
+        } else {
+          isUsernameValid = false;
+        }
       } catch (err) {
-        isValid = false;
-        usernameErr.err = "Пользователь не существует";
+        isUsernameValid = false;
+        setUsernameErr("Пользователь не существует");
       }
     }
 
-    setPasswordErr(passwordErr);
-    setUsernameErr(usernameErr);
+    if (isPasswordValid && isUsernameValid) isValid = true;
 
+    sessionStorage.setItem("isValid", isValid);
     return isValid;
   };
 
@@ -91,20 +100,8 @@ export const Auth = () => {
         </div>
       </fieldset>
       <div className={classes.errors}>
-        {Object.keys(usernameErr).map((key, index) => {
-          return (
-            <p key={index} className={classes.error}>
-              {usernameErr[key]}
-            </p>
-          );
-        })}
-        {Object.keys(passwordErr).map((key, index) => {
-          return (
-            <p key={index} className={classes.error}>
-              {passwordErr[key]}
-            </p>
-          );
-        })}
+        {usernameErr && <p className={classes.error}>{usernameErr}</p>}
+        {passwordErr && <p className={classes.error}>{passwordErr}</p>}
       </div>
     </form>
   );
